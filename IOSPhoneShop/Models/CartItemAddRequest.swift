@@ -1,0 +1,3 @@
+/* CartItemAddRequest.swift */
+import Foundation
+

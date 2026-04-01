@@ -1,0 +1,32 @@
+func fetchUserCoupons(completion: @escaping ([CouponItem]?) -> Void) {
+    guard let url = URL(string: "http://localhost:8080/user/coupons") else { return }
+    let token = UserDefaults.standard.string(forKey: "userToken") ?? ""
+    
+    var request = URLRequest(url: url)
+    request.httpMethod = "GET"
+    request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+    
+    URLSession.shared.dataTask(with: request) { data, response, error in
+        guard let data = data else {
+            DispatchQueue.main.async { completion(nil) }
+            return
+        }
+        
+        // 디버깅용: 서버가 실제로 무엇을 주는지 확인 (필수!)
+        if let jsonString = String(data: data, encoding: .utf8) {
+            print("🚨 [쿠폰 목록 원본]: \(jsonString)")
+        }
+        
+        do {
+            // 1. [CouponItem].self 대신 CouponListResponse.self로 시도
+            let responseWrapper = try JSONDecoder().decode(CouponListResponse.self, from: data)
+            DispatchQueue.main.async { 
+                completion(responseWrapper.coupons) 
+            }
+        } catch {
+            // 2. 만약 위 방법도 안되면, 서버가 보낸 Key 이름이 "coupons"가 아닐 수 있습니다.
+            print("❌ 쿠폰 목록 디코딩 실패: \(error)")
+            DispatchQueue.main.async { completion(nil) }
+        }
+    }.resume()
+}
