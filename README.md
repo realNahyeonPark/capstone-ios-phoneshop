@@ -1,8 +1,11 @@
-# 📱 IOSPhoneShop
+# 📱 iOSPhoneShop
 
 ## 📝 프로젝트 소개
 iPhone 제품을 조회하고 구매할 수 있는 iOS 쇼핑몰 애플리케이션입니다. 
 REST API를 통해 Spring Boot 백엔드와 연동하여 실시간 데이터를 처리합니다.
+
+## 지원 문의
+2371433@hansung.ac.kr
 
 ## 🛠 Tech Stack
 - **Language**: Swift
