@@ -1,0 +1,18 @@
+import SwiftUI
+
+struct ContentView: View {
+    let averageRatings: [AverageRating]
+    @StateObject private var navManager = NavigationManager()
+    
+    @State private var isLoggedIn = false
+    @State private var userName: String = ""
+    @State private var userEmail: String = ""
+
+    var body: some View {
+        if isLoggedIn {
+            MainTabView(averageRatings: averageRatings, isLoggedIn: $isLoggedIn, userName: $userName, userEmail: $userEmail).environmentObject(CartService()).environmentObject(navManager)
+        } else {
+            LoginView(isLoggedIn: $isLoggedIn, userName: $userName, userEmail: $userEmail)
+        }
+    }
+}
