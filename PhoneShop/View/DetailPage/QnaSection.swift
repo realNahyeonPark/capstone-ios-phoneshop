@@ -75,21 +75,34 @@ struct BottomActionBar: View {
     let product: Product
     @EnvironmentObject var cartService: CartService
     
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     @State private var isShowingCheckout = false
     @State private var showingAlert = false
+    @State private var showLoginAlert = false
     
     var body: some View {
         VStack(spacing: 0) {
             Divider()
             HStack(spacing: 15) {
                 Button(action: {
-                    cartService.addToCart(phoneId: product.id)
-                    showingAlert = true}) {
+                    if isLoggedIn {
+                        cartService.addToCart(phoneId: product.id)
+                        showingAlert = true
+                    } else {
+                        showLoginAlert = true
+                    }
+                }) {
                     Image(systemName: "cart").font(.title2).foregroundColor(.blue)
                         .padding().background(Color.blue.opacity(0.1)).cornerRadius(12)
                 }
                 
-                Button(action: { isShowingCheckout = true }) {
+                Button(action: {
+                    if isLoggedIn {
+                        isShowingCheckout = true
+                    } else {
+                        showLoginAlert = true
+                    }
+                }) {
                     Text("구매하기").font(.headline).foregroundColor(.white)
                         .frame(maxWidth: .infinity).padding().background(Color.blue).cornerRadius(12)
                 }
@@ -98,10 +111,15 @@ struct BottomActionBar: View {
         }
         .background(Color.white)
         .alert("장바구니 담기 완료", isPresented: $showingAlert) {
-                    Button("확인", role: .cancel) { }
-                } message: {
-                    Text("상품이 장바구니에 추가되었습니다.")
-                }
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text("상품이 장바구니에 추가되었습니다.")
+        }
+        .alert("알림", isPresented: $showLoginAlert) {
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text("로그인 후 이용 가능한 서비스입니다.")
+        }
         .navigationDestination(isPresented: $isShowingCheckout) {
             CheckoutView(products: [product])
         }

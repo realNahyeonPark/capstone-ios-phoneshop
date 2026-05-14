@@ -29,7 +29,7 @@ struct OrderSuccessView: View {
             Spacer()
             
             Button {
-                navManager.popToRoot()
+                navManager.forceGoToHome()
             } label: {
                 Text("메인화면으로 돌아가기")
                     .font(.system(size: 17, weight: .bold))

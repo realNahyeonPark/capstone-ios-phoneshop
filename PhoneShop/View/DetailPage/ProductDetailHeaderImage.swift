@@ -4,6 +4,9 @@ struct ProductDetailHeaderImage: View {
     let product: Product
     @EnvironmentObject var favoritesManager: FavoritesManager
     
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
+    @State private var showLoginAlert = false
+    
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             Color(.systemGray6)
@@ -26,18 +29,29 @@ struct ProductDetailHeaderImage: View {
             }
             .frame(height: 300)
 
+            let isFavoriteRed = isLoggedIn && favoritesManager.isFavorite(productId: product.id)
+
             Button(action: {
-                withAnimation(.spring()) {
-                    favoritesManager.toggleFavorite(product: product)
+                if isLoggedIn {
+                    withAnimation(.spring()) {
+                        favoritesManager.toggleFavorite(product: product)
+                    }
+                } else {
+                    showLoginAlert = true
                 }
             }) {
-                Image(systemName: favoritesManager.isFavorite(productId: product.id) ? "heart.fill" : "heart")
+                Image(systemName: isFavoriteRed ? "heart.fill" : "heart")
                     .font(.system(size: 24))
-                    .foregroundColor(favoritesManager.isFavorite(productId: product.id) ? .red : .gray)
+                    .foregroundColor(isFavoriteRed ? .red : .gray)
                     .padding(12)
                     .background(Circle().fill(Color.white.opacity(0.8)))
                     .padding(15)
             }
+        }
+        .alert("알림", isPresented: $showLoginAlert) {
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text("찜하기 기능은 로그인 후 이용 가능합니다.")
         }
     }
 }

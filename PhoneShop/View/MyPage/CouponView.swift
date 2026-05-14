@@ -34,7 +34,7 @@ struct CouponView: View {
             Image(systemName: "ticket.fill")
                 .font(.system(size: 70))
                 .foregroundStyle(.gray.opacity(0.2))
-            Text("보유하신 쿠폰이 없어요")
+            Text("보유중인 쿠폰이 없습니다.")
                 .font(.system(size: 18, weight: .medium))
                 .foregroundColor(.secondary)
             Spacer()

@@ -328,7 +328,8 @@
 				EDB53BB12F17356A00DEBB87 /* Assets.xcassets */,
 				EDB53BB22F17356A00DEBB87 /* IOSPhoneShopApp.swift */,
 			);
-			path = IOSPhoneShop;
+			name = IOSPhoneShop;
+			path = PhoneShop;
 			sourceTree = "<group>";
 		};
 		EDB53BB92F17357200DEBB87 /* Models */ = {
@@ -431,7 +432,7 @@
 					};
 				};
 			};
-			buildConfigurationList = EDA0A7E12F15DF4300DA340B /* Build configuration list for PBXProject "IOSPhoneShop" */;
+			buildConfigurationList = EDA0A7E12F15DF4300DA340B /* Build configuration list for PBXProject "PhoneShop" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -678,7 +679,7 @@
 				DEVELOPMENT_TEAM = N97B7W4C45;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IOSPhoneShop/Info.plist;
+				INFOPLIST_FILE = PhoneShop/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "한성전자";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -714,7 +715,7 @@
 				DEVELOPMENT_TEAM = N97B7W4C45;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IOSPhoneShop/Info.plist;
+				INFOPLIST_FILE = PhoneShop/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "한성전자";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -742,7 +743,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		EDA0A7E12F15DF4300DA340B /* Build configuration list for PBXProject "IOSPhoneShop" */ = {
+		EDA0A7E12F15DF4300DA340B /* Build configuration list for PBXProject "PhoneShop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EDA0A7EF2F15DF4400DA340B /* Debug */,

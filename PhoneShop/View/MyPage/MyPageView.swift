@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct MyPageView: View {
-    @Binding var isLoggedIn: Bool
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
+    @State private var showLoginSheet = false
     
     @AppStorage("userRole") var userRole: String = "USER"
     @AppStorage("userName") var userName: String = "사용자"
@@ -18,7 +19,11 @@ struct MyPageView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 0) {
-                    NavigationLink(destination: EditProfileView(userName: $userName)) {
+                    Button(action: {
+                        if !isLoggedIn {
+                            showLoginSheet = true
+                        }
+                    }) {
                         HStack(spacing: 15) {
                             Image(systemName: "person.circle.fill")
                                 .resizable()
@@ -29,12 +34,23 @@ struct MyPageView: View {
                             
                             VStack(alignment: .leading, spacing: 3) {
                                 HStack(spacing: 4) {
-                                    Text(userName)
+                                    Text(isLoggedIn ? "\(userName)님" : "로그인이 필요합니다")
                                         .font(.system(size: 19, weight: .bold))
                                         .foregroundColor(.black)
+                                    
                                     Image(systemName: "chevron.right")
                                         .font(.system(size: 14, weight: .semibold))
                                         .foregroundColor(.gray)
+                                }
+                                
+                                if !isLoggedIn {
+                                    Text("여기를 눌러 로그인하세요")
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.blue)
+                                } else {
+                                    Text("환영합니다. ")
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.secondary)
                                 }
                             }
                             Spacer()
@@ -49,18 +65,20 @@ struct MyPageView: View {
                     .padding(.top, 15)
                     .padding(.bottom, 15)
 
-                    HStack(spacing: 0) {
-                        GridMenuItem(destination: AnyView(OrderListView()), icon: "list.clipboard", title: "주문목록")
-                        GridMenuItem(destination: AnyView(WishlistView()), icon: "heart", title: "찜한상품")
-                        GridMenuItem(destination: AnyView(CouponView()), icon: "tag", title: "쿠폰함")
-                        GridMenuItem(destination: AnyView(MyReviewsView()), icon: "square.and.pencil", title: "리뷰관리")
+                    if isLoggedIn {
+                        HStack(spacing: 0) {
+                            GridMenuItem(destination: AnyView(OrderListView()), icon: "list.clipboard", title: "주문목록")
+                            GridMenuItem(destination: AnyView(WishlistView()), icon: "heart", title: "찜한상품")
+                            GridMenuItem(destination: AnyView(CouponView()), icon: "tag", title: "쿠폰함")
+                            GridMenuItem(destination: AnyView(MyReviewsView()), icon: "square.and.pencil", title: "리뷰관리")
+                        }
+                        .padding(.vertical, 20)
+                        .background(Color.white)
+                        
+                        Rectangle().fill(Color(.systemGray6)).frame(height: 10)
                     }
-                    .padding(.vertical, 20)
-                    .background(Color.white)
 
-                    Rectangle().fill(Color(.systemGray6)).frame(height: 10)
-
-                    if userRole == "ADMIN" {
+                    if isLoggedIn && userRole == "ADMIN" {
                         VStack(alignment: .leading, spacing: 0) {
                             Text("관리자 메뉴")
                                 .font(.system(size: 14, weight: .bold))
@@ -105,21 +123,32 @@ struct MyPageView: View {
                     Rectangle().fill(Color(.systemGray6)).frame(height: 10)
 
                     VStack(spacing: 0) {
-                        NavigationLink(destination: WithdrawView(isLoggedIn: $isLoggedIn)) {
-                            HStack {
-                                Text("회원 탈퇴").font(.system(size: 15)).foregroundColor(.red)
-                                Spacer()
-                                Image(systemName: "chevron.right").font(.system(size: 14)).foregroundColor(Color(.systemGray4))
+                        if isLoggedIn {
+                            NavigationLink(destination: WithdrawView(isLoggedIn: $isLoggedIn)) {
+                                HStack {
+                                    Text("회원 탈퇴").font(.system(size: 15)).foregroundColor(.red)
+                                    Spacer()
+                                    Image(systemName: "chevron.right").font(.system(size: 14)).foregroundColor(Color(.systemGray4))
+                                }
+                                .padding(.horizontal, 20).padding(.vertical, 18)
                             }
-                            .padding(.horizontal, 20).padding(.vertical, 18)
-                        }
-                        Divider().padding(.horizontal, 20)
-                        Button(action: { logout() }) {
+                            Divider().padding(.horizontal, 20)
+                            Button(action: { logout() }) {
+                                HStack {
+                                    Text("로그아웃").font(.system(size: 15)).foregroundColor(.gray)
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 20).padding(.vertical, 18)
+                            }
+                        } else {
                             HStack {
-                                Text("로그아웃").font(.system(size: 15)).foregroundColor(.gray)
+                                Spacer()
+                                Text("로그인하고 모든 기능을 이용해보세요")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.secondary)
+                                    .padding(.vertical, 30)
                                 Spacer()
                             }
-                            .padding(.horizontal, 20).padding(.vertical, 18)
                         }
                     }
                     .background(Color.white)
@@ -129,10 +158,20 @@ struct MyPageView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("마이페이지")
             .onAppear {
-                Task {
-                    await UserService.shared.fetchAndSaveUserInfo()
+                if isLoggedIn {
+                    Task {
+                        await UserService.shared.fetchAndSaveUserInfo()
+                    }
                 }
                 loadRandomRecommendations()
+            }
+            .sheet(isPresented: $showLoginSheet) {
+                LoginView(
+                    isLoggedIn: $isLoggedIn,
+                    userName: $userName,
+                    userEmail: .constant(""),
+                    showSheet: $showLoginSheet
+                )
             }
         }
     }
@@ -151,6 +190,7 @@ struct MyPageView: View {
         UserDefaults.standard.removeObject(forKey: "userToken")
         UserDefaults.standard.removeObject(forKey: "userName")
         UserDefaults.standard.removeObject(forKey: "userRole")
+        UserDefaults.standard.set(false, forKey: "isLoggedIn")
         isLoggedIn = false
     }
 }

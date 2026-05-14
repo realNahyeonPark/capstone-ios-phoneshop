@@ -1,9 +1,12 @@
 import SwiftUI
 
 struct LoginView: View {
+    @AppStorage("isLoggedIn") var isLoggedInStorage: Bool = false
+    
     @Binding var isLoggedIn: Bool
     @Binding var userName: String
     @Binding var userEmail: String
+    @Binding var showSheet: Bool
     
     @State private var email = ""
     @State private var password = ""
@@ -45,7 +48,7 @@ struct LoginView: View {
                         HStack {
                             NavigationLink("회원가입", destination: SignUpView())
                             Spacer()
-                            NavigationLink("비밀번호 찾기", destination:ResetPasswordView())
+                            NavigationLink("비밀번호 찾기", destination: ResetPasswordView())
                         }
                         .font(.footnote)
                         .padding(.horizontal)
@@ -53,6 +56,19 @@ struct LoginView: View {
                 }
                 .padding(.horizontal, 30)
                 Spacer()
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        showSheet = false
+                    }) {
+                        HStack(spacing: 5) {
+                            Image(systemName: "chevron.left")
+                            Text("뒤로")
+                        }
+                        .foregroundColor(.blue)
+                    }
+                }
             }
             .alert("로그인", isPresented: $showAlert) {
                 Button("확인", role: .cancel) { }
@@ -67,7 +83,14 @@ struct LoginView: View {
         
         UserService.shared.login(loginData: loginData) { token in
             if token != nil {
-                self.isLoggedIn = true
+                Task {
+                    await UserService.shared.fetchAndSaveUserInfo()
+                    DispatchQueue.main.async {
+                        self.isLoggedInStorage = true
+                        self.isLoggedIn = true
+                        self.showSheet = false
+                    }
+                }
             } else {
                 self.alertMessage = "로그인 정보가 올바르지 않습니다."
                 self.showAlert = true

@@ -5,6 +5,9 @@ struct ProductCardView: View {
     
     @EnvironmentObject var favoritesManager: FavoritesManager
     
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
+    @State private var showLoginAlert = false
+    
     @State private var averageRating: Double?
     private let reviewService = ReviewService()
 
@@ -36,10 +39,16 @@ struct ProductCardView: View {
                 .clipped()
                 
                 Button {
-                    favoritesManager.toggleFavorite(product: product)
+                    if isLoggedIn {
+                        favoritesManager.toggleFavorite(product: product)
+                    } else {
+                        showLoginAlert = true
+                    }
                 } label: {
-                    Image(systemName: favoritesManager.isFavorite(productId: product.id) ? "heart.fill" : "heart")
-                        .foregroundColor(favoritesManager.isFavorite(productId: product.id) ? .red : .white)
+                    let isCurrentlyFavorite = isLoggedIn && favoritesManager.isFavorite(productId: product.id)
+                    
+                    Image(systemName: isCurrentlyFavorite ? "heart.fill" : "heart")
+                        .foregroundColor(isCurrentlyFavorite ? .red : .white)
                         .padding(8)
                         .background(Color.black.opacity(0.35))
                         .clipShape(Circle())
@@ -66,9 +75,11 @@ struct ProductCardView: View {
                         .font(.caption2)
                         .foregroundColor(.secondary)
                         .padding(.trailing, 6)
+                    
                     Image(systemName: "heart.fill")
                         .font(.caption2)
                         .foregroundColor(.secondary)
+                    
                     Text("\(product.favoriteCount)")
                         .font(.caption2)
                         .foregroundColor(.secondary)
@@ -91,6 +102,11 @@ struct ProductCardView: View {
         .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
         .task {
             self.averageRating = await reviewService.fetchAverageRating(phoneId: String(product.id))?.averageRating
+        }
+        .alert("알림", isPresented: $showLoginAlert) {
+            Button("확인", role: .cancel) { }
+        } message: {
+            Text("찜하기 기능은 로그인 후 이용 가능합니다.")
         }
     }
 }

@@ -28,7 +28,7 @@ struct MainTabView: View {
             .tag(1)
 
             NavigationStack {
-                MyPageView(isLoggedIn: $isLoggedIn)
+                MyPageView()
             }
             .tabItem {
                 Label("마이", systemImage: "person.fill")

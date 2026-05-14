@@ -4,7 +4,6 @@ enum SortOption: String, CaseIterable {
     case accuracy = "추천순"
     case priceLow = "낮은가격순"
     case priceHigh = "높은가격순"
-    case review = "리뷰많은순"
     case rating = "별점높은순"
     case alphabet = "가나다순"
 }
@@ -94,7 +93,7 @@ struct ProductRowView: View {
     let product: Product
     
     @State private var rating: Double = 0.0
-    @State private var totalReviewCount: Int = 0
+    // totalReviewCount 변수 삭제
     private let reviewService = ReviewService()
     
     var body: some View {
@@ -115,7 +114,7 @@ struct ProductRowView: View {
                 HStack(spacing: 2) {
                     Image(systemName: "star.fill").foregroundColor(.orange).font(.system(size: 11))
                     Text(String(format: "%.1f", rating)).font(.system(size: 12, weight: .bold))
-                    Text("(\(totalReviewCount.formatted()))").font(.system(size: 12)).foregroundColor(.secondary)
+                    // 리뷰 개수 표시 텍스트 삭제
                 }
                 
                 Spacer(minLength: 12)
@@ -130,7 +129,7 @@ struct ProductRowView: View {
         .task {
             if let stats = await reviewService.fetchAverageRating(phoneId: String(product.id)) {
                 self.rating = stats.averageRating
-                self.totalReviewCount = stats.totalReviewCount ?? 0
+                // totalReviewCount 할당 코드 삭제
             }
         }
     }

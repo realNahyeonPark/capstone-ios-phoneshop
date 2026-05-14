@@ -36,7 +36,7 @@ struct SearchView: View {
                 Button(action: {if navManager.path.isEmpty {
                     navManager.selectedTab = 0
                 } else {
-                    navManager.popToRoot()
+                    navManager.forceGoToHome()
                 }
                 }) {
                     Image(systemName: "chevron.left")
